@@ -1,26 +1,39 @@
 #!/usr/bin/env bash
 
+# Echo the purpose of this script
 echo 'The following Maven command installs your Maven-built Java application'
 echo 'into the local Maven repository, which will ultimately be stored in'
 echo 'Jenkins''s local Maven repository (and the "maven-repository" Docker data'
 echo 'volume).'
+
+# Install the project into the local Maven repository
 set -x
 mvn jar:jar install:install help:evaluate -Dexpression=project.name
 set +x
 
-echo 'The following complex command extracts the value of the <name/> element'
-echo 'within <project/> of your Java/Maven project''s "pom.xml" file.'
+# Extract the project name and version from the pom.xml
+echo 'Extracting the project name and version from pom.xml'
 set -x
-NAME=`mvn help:evaluate -Dexpression=project.name | grep "^[^\[]"`
+NAME=$(mvn help:evaluate -Dexpression=project.artifactId | grep "^[^\[]" | tr -d '[:space:]')
+VERSION=$(mvn help:evaluate -Dexpression=project.version | grep "^[^\[]" | tr -d '[:space:]')
 set +x
 
-echo 'The following complex command behaves similarly to the previous one but'
-echo 'extracts the value of the <version/> element within <project/> instead.'
-set -x
-VERSION=`mvn help:evaluate -Dexpression=project.version | grep "^[^\[]"`
-set +x
+# Echo the name and version
+echo "Project Name: $NAME"
+echo "Version: $VERSION"
 
-echo 'The following command runs and outputs the execution of your Java'
-echo 'application (which Jenkins built using Maven) to the Jenkins UI.'
+# Execute the Java application using the jar file
+echo 'Running the Java application.'
 set -x
-java -jar target/${NAME}-${VERSION}.jar
+
+# Constructing the jar file name based on the extracted project name and version
+JAR_NAME="${NAME}-${VERSION}.jar"
+JAR_PATH="target/${JAR_NAME}"
+
+# Check if the jar exists and is a file before attempting to run
+if [ -f "$JAR_PATH" ]; then
+    java -jar $JAR_PATH
+else
+    echo "Error: Jar file not found at $JAR_PATH"
+    exit 1
+fi
