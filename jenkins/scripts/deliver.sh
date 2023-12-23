@@ -19,14 +19,20 @@ VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 # Debug: print the variables
 echo "NAME: $NAME, VERSION: $VERSION"
 
+#!/usr/bin/env bash
+
+# Define NAME and VERSION directly
+NAME="my-app"
+VERSION="1.0-SNAPSHOT"
+
 # Constructing jar file name and path
 JAR_NAME="${NAME}-${VERSION}.jar"
 JAR_PATH="target/${JAR_NAME}"
 
-# Debug: print the expected jar path
+# Print the expected jar path for debugging
 echo "Expected jar path: $JAR_PATH"
 
-# Debug: list files in target
+# Listing files in target directory for debugging
 echo "Listing files in target directory:"
 ls target/
 
