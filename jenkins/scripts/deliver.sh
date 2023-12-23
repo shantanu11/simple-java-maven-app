@@ -7,22 +7,28 @@ echo 'Jenkins''s local Maven repository (and the "maven-repository" Docker data'
 echo 'volume).'
 
 #!/usr/bin/env bash
+#!/usr/bin/env bash
 
-#The following commands install your Java application into the local Maven repository
-set -x
+# Install the project into the local Maven repository
 mvn jar:jar install:install help:evaluate -Dexpression=project.name
-set +x
 
 # Extracting project name and version from the pom.xml
 NAME=$(mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout)
 VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
 
+# Debug: print the variables
+echo "NAME: $NAME, VERSION: $VERSION"
+
 # Constructing jar file name and path
 JAR_NAME="${NAME}-${VERSION}.jar"
 JAR_PATH="target/${JAR_NAME}"
 
-# Printing the expected path for debugging
+# Debug: print the expected jar path
 echo "Expected jar path: $JAR_PATH"
+
+# Debug: list files in target
+echo "Listing files in target directory:"
+ls target/
 
 # Running the Java application if the jar exists
 if [ -f "$JAR_PATH" ]; then
